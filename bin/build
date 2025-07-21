@@ -1,16 +1,17 @@
 #!/usr/bin/env node
-const dedent = require('dedent')
-const fs = require('fs')
-const mkdirp = require('mkdirp')
-const moment = require('moment')
-const ora = require('ora')
-const path = require('path')
+import dedent from 'dedent'
+import fs from 'fs'
+import {mkdirp} from 'mkdirp'
+import moment from 'moment'
+import ora from 'ora'
+import path from 'path'
 
+const __dirname = path.dirname(new URL(import.meta.url).pathname)
 const start = moment('1970-01-01')
 const end = moment('2038-01-19')
 const root = path.join(__dirname, `../packages`)
 const license = fs.readFileSync(path.join(__dirname, '../LICENSE')).toString()
-const version = require('../package.json').version
+const version = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'))).version
 
 for (let i = start.clone(); i.isSameOrBefore(end, 'year'); i.add(1, 'year')) {
   const from = i.clone()
@@ -22,18 +23,17 @@ for (let i = start.clone(); i.isSameOrBefore(end, 'year'); i.add(1, 'year')) {
 
   for (let day = from; day.isBefore(to, 'day') && day.isSameOrBefore(end, 'day'); day.add(1, 'day')) {
     const name = day.format('YYYY/MM/DD')
-    const dir = `${root}/${name}`
 
     spinner.text = `Generating @year/${name}`
     spinner.render()
 
-    mkdirp.sync(dir)
+    mkdirp.sync(`${root}/${day.format('YYYY/MM')}`)
 
-    write(`${dir}/index.js`, `
-      module.exports = new Date(${day.year()}, ${day.month()}, ${day.date()})
+    write(`${root}/${day.format('YYYY/MM/DD')}.js`, `
+      export default new Date(Date.UTC(${day.year()}, ${day.month()}, ${day.date()}))
     `)
 
-    test += `test('is ${name}', t => t.is(moment(require('./${day.format('MM/DD')}')).format('YYYY/MM/DD'), '${name}'))\n`
+    test += `test('is ${name}', async (t) => t.is(moment((await import('./${day.format('MM/DD')}.js')).default).format('YYYY/MM/DD'), '${name}'))\n`
   }
 
   write(`${dir}/package.json`, `
@@ -43,10 +43,14 @@ for (let i = start.clone(); i.isSameOrBefore(end, 'year'); i.add(1, 'year')) {
       "description": "A year ${year}",
       "repository": "https://github.com/antonmedv/year/tree/master/packages/${year}",
       "license": "MIT",
+      "type": "module",
       "keywords": [
         "date",
         "year"
-      ]
+      ],
+      "exports": {
+        "./*": "./*.js"
+      }
     }
   `)
 
@@ -69,34 +73,34 @@ for (let i = start.clone(); i.isSameOrBefore(end, 'year'); i.add(1, 'year')) {
 
   write(`${dir}/readme.md`, `
     # @year/${year}
-    
+
     A year ${year}
-    
+
     ## Install
-    
+
     ~~~
     npm install @year/${year}
     ~~~
-    
+
     ## Usage
-    
+
     ~~~js
-    const day = require('@year/${year}/01/01')
+    import date from '@year/${year}/01/01'
     ~~~
-    
+
     Returns a [Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) object.
-    
+
     ## Related
-    
+
     ${before}${after}
     ## License
-    
+
     MIT
   `)
 
   write(`${dir}/test.js`, `
-    const test = require('ava')
-    const moment = require('moment')
+    import test from 'ava'
+    import moment from 'moment'
 
     ${test}
   `)
