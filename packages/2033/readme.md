@@ -11,7 +11,7 @@ npm install @year/2033
 ## Usage
 
 ~~~js
-const day = require('@year/2033/01/01')
+import date from '@year/2033/01/01'
 ~~~
 
 Returns a [Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) object.

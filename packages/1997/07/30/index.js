@@ -1,1 +1,0 @@
-module.exports = new Date(1997, 6, 30)

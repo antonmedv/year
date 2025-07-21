@@ -1,11 +1,15 @@
 {
   "name": "@year/2000",
-  "version": "0.0.0",
+  "version": "2.0.0",
   "description": "A year 2000",
   "repository": "https://github.com/antonmedv/year/tree/master/packages/2000",
   "license": "MIT",
+  "type": "module",
   "keywords": [
     "date",
     "year"
-  ]
+  ],
+  "exports": {
+    "./*": "./*.js"
+  }
 }

@@ -1,0 +1,1 @@
+export default new Date(Date.UTC(1993, 4, 4))
