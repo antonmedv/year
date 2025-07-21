@@ -1,0 +1,11 @@
+{
+  "name": "@year/2008",
+  "version": "0.0.0",
+  "description": "A year 2008",
+  "repository": "https://github.com/antonmedv/year/tree/master/packages/2008",
+  "license": "MIT",
+  "keywords": [
+    "date",
+    "year"
+  ]
+}

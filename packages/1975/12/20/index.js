@@ -1,0 +1,1 @@
+module.exports = new Date(1975, 11, 20)
